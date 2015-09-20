@@ -134,8 +134,10 @@ module DataMagic
   end
 
   def self.create_index(es_index_name = nil, field_types={})
-    logger.info "create_index field_types: #{field_types.inspect[0..500]}"
     es_index_name ||= self.config.scoped_index_name
+    return es_index_name if client.indices.exists? index: es_index_name
+
+    logger.info "create_index field_types: #{field_types.inspect[0..500]}"
     field_types['location'] = 'geo_point'
     es_types = NestedHash.new.add(es_field_types(field_types))
     nested_object_type(es_types)
